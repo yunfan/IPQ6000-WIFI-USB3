@@ -3,10 +3,10 @@ name: Build Specific DTS to DTB
 on:
   push:
     branches:
-      - main
+      - wifi
   pull_request:
     branches:
-      - main
+      - wifi
   workflow_dispatch:
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
       # Checkout the specific repository provided by the user
       uses: actions/checkout@v4
       with:
-        repository: Kurosaki-Senpai/IPQ6000-WIFI-USB3
+        repository: yunfan/IPQ6000-WIFI-USB3
         path: openwrt-source
         # Optional: Use a specific branch if necessary, e.g., 'master' or 'main'
 
@@ -38,7 +38,7 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         # Copy the default config provided in the repo (adjust path if needed)
-        cp .config.seed .config 
+        cp config/zn-m2.config .config 
         make defconfig
         # Clean up existing build artifacts but keep configuration
         make target/linux/clean V=s
