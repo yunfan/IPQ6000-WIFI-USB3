@@ -62,6 +62,15 @@ jobs:
         make toolchain/install target/linux/prepare V=s
       working-directory: openwrt-source
 
+    # --- New Step 1: Upload Toolchain and Kernel Source Artifacts ---
+    - name: Archive and Upload Build Environment Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: openwrt-build-environment
+        path: |
+          openwrt-source/staging_dir
+          openwrt-source/build_dir/target-*/linux-*
+
     - name: Compile the Target DTS file to DTB
       # Now use the cross-compiler and the prepared kernel source directory to compile the specific file
       run: |
