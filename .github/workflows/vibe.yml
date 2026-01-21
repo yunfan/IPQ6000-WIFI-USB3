@@ -1,0 +1,80 @@
+name: Build Specific DTS to DTB
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-dtb:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout OpenWrt Repository
+      # Checkout the specific repository provided by the user
+      uses: actions/checkout@v4
+      with:
+        repository: Kurosaki-Senpai/IPQ6000-WIFI-USB3
+        path: openwrt-source
+        # Optional: Use a specific branch if necessary, e.g., 'master' or 'main'
+
+    - name: Install Build Dependencies
+      # Install necessary tools for the OpenWrt build system
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync device-tree-compiler
+      working-directory: openwrt-source
+
+    - name: Configure OpenWrt Build Environment (Minimal)
+      # This step sets the target architecture, which is crucial for setting up the correct toolchain and include paths.
+      # The .config file from the repo is assumed to be correct for the qcom-ipq6018 target.
+      run: |
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        # Copy the default config provided in the repo (adjust path if needed)
+        cp .config.seed .config 
+        make defconfig
+        # Clean up existing build artifacts but keep configuration
+        make target/linux/clean V=s
+      working-directory: openwrt-source
+      
+    - name: Build ONLY the Toolchain and Prepare Kernel Source
+      # This builds the necessary cross-compiler and extracts the specific kernel source with all patches/headers
+      run: |
+        make toolchain/install target/linux/prepare V=s
+      working-directory: openwrt-source
+
+    - name: Compile the Target DTS file to DTB
+      # Now use the cross-compiler and the prepared kernel source directory to compile the specific file
+      run: |
+        DTS_FILE="target/linux/ipq60xx/files-5.15/arch/arm64/boot/dts/qcom-ipq6018-zn-m2.dts" # Verify this path in the repo
+        BUILD_DIR=$(find build_dir/target-* -maxdepth 1 -type d | head -n 1)
+        KERNEL_DIR="${BUILD_DIR}/linux-ipq60xx-5.15.152" # Adjust kernel version as needed
+        STAGING_DIR=$(pwd)/staging_dir/host/bin
+
+        # Use the specific cross-compiler (gcc-11.2.0 is common for this repo)
+        export PATH=$STAGING_DIR:$PATH
+        export CROSS_COMPILE=aarch64-openwrt-linux-musl-
+        export ARCH=arm64
+
+        # Manually run cpp then dtc using the paths prepared by 'make target/linux/prepare'
+        gcc -E -nostdinc -undef -x assembler-with-cpp \
+          -I ${KERNEL_DIR}/include \
+          -I ${KERNEL_DIR}/arch/arm64/boot/dts \
+          $DTS_FILE -o qcom-ipq6018-zn-m2.dts.preprocessed
+
+        dtc -I dts -O dtb -o ./qcom-ipq6018-zn-m2.dtb ./qcom-ipq6018-zn-m2.dts.preprocessed
+        
+      working-directory: openwrt-source
+
+    - name: Upload the generated DTB artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: device-tree-blob
+        path: openwrt-source/qcom-ipq6018-zn-m2.dtb
+
+
