@@ -30,8 +30,8 @@ jobs:
     - name: Install Build Dependencies
       # Install necessary tools for the OpenWrt build system
       run: |
-        apt-get update
-        apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync device-tree-compiler \
+        apt update -y
+        apt install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync device-tree-compiler
         apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
             bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
             git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
