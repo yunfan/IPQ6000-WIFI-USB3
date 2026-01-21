@@ -14,8 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE: 1
-
     steps:
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
     - name: Checkout OpenWrt Repository
       # Checkout the specific repository provided by the user
       uses: actions/checkout@v4
