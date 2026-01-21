@@ -12,6 +12,8 @@ on:
 jobs:
   build-dtb:
     runs-on: ubuntu-latest
+    env:
+      FORCE: 1
 
     steps:
     - name: Checkout OpenWrt Repository
