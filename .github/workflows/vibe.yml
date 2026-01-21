@@ -65,9 +65,9 @@ jobs:
     - name: Compile the Target DTS file to DTB
       # Now use the cross-compiler and the prepared kernel source directory to compile the specific file
       run: |
-        DTS_FILE="target/linux/ipq60xx/files-5.15/arch/arm64/boot/dts/qcom-ipq6018-zn-m2.dts" # Verify this path in the repo
+        DTS_FILE="target/linux/ipq60xx/files-4.4/arch/arm64/boot/dts/qcom-ipq6018-zn-m2.dts" # Verify this path in the repo
         BUILD_DIR=$(find build_dir/target-* -maxdepth 1 -type d | head -n 1)
-        KERNEL_DIR="${BUILD_DIR}/linux-ipq60xx-5.15.152" # Adjust kernel version as needed
+        KERNEL_DIR="${BUILD_DIR}/linux-ipq60xx-4.4" # Adjust kernel version as needed
         STAGING_DIR=$(pwd)/staging_dir/host/bin
 
         # Use the specific cross-compiler (gcc-11.2.0 is common for this repo)
