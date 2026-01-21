@@ -12,14 +12,13 @@ on:
 jobs:
   build-dtb:
     runs-on: ubuntu-latest
-    env:
-      FORCE: 1
+    container:
+      image: ubuntu:20.04
+      env:
+        TZ: Asia/Shanghai
+        FORCE: 1
+        FORCE_UNSAFE_CONFIGURE: 1
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
-
     - name: Checkout OpenWrt Repository
       # Checkout the specific repository provided by the user
       uses: actions/checkout@v4
@@ -31,9 +30,9 @@ jobs:
     - name: Install Build Dependencies
       # Install necessary tools for the OpenWrt build system
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync device-tree-compiler \
-        sudo apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+        apt-get update
+        apt-get install -y build-essential libncurses5-dev zlib1g-dev gawk git gettext libssl-dev xsltproc rsync device-tree-compiler \
+        apt install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
             bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
             git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
             libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
